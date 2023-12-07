@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import PostManagement from "./PostManagement";
 import SignupForm from "./SignupForm";
 import LoginForm from "./LoginForm";
-const MainRoutes = () => {
+const Mroutes = () => {
   return (
     <div>
       <Routes>
@@ -14,4 +14,4 @@ const MainRoutes = () => {
   );
 };
 
-export default MainRoutes;
+export default Mroutes;

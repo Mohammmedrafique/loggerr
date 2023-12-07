@@ -1,11 +1,11 @@
-import MainRoutes from "./pages/MainRoutes";
+import Mroutes from "./pages/Mroutes";
 import Navbar from "./pages/Navbar";
 
 const App = () => {
   return (
     <div>
       <Navbar />
-      <MainRoutes />
+      <Mroutes />
     </div>
   );
 };
