@@ -1,4 +1,4 @@
-import MainRoutes from "./pages/MainRoutes.JSX";
+import MainRoutes from "./pages/MainRoutes";
 import Navbar from "./pages/Navbar";
 
 const App = () => {
