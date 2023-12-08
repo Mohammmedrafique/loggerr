@@ -30,7 +30,7 @@ const SignupForm = () => {
 
       if (response.ok) {
         console.log("Registration successful");
-        navigate("/blogs");
+        navigate("/login");
       } else {
         console.error("Registration failed");
       }
