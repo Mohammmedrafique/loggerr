@@ -13,7 +13,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/user/login",
+        "https://nice-erin-frog-wear.cyclic.app/api/user/login",
         {
           email,
           password,

@@ -22,7 +22,7 @@ const PostManagement = () => {
 
   const fetchPosts = (token) => {
     axios
-      .get("http://localhost:8000/api/blogs/getAllBlogs", {
+      .get("https://nice-erin-frog-wear.cyclic.app/api/blogs/getAllBlogs", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -36,7 +36,7 @@ const PostManagement = () => {
 
   const handleCreatePost = () => {
     axios
-      .post("http://localhost:8000/api/blogs/createBlog", newPost, {
+      .post("https://nice-erin-frog-wear.cyclic.app/api/blogs/createBlog", newPost, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,7 +51,7 @@ const PostManagement = () => {
   const handleUpdatePost = (postId, updatedPost) => {
     axios
       .put(
-        `http://localhost:8000/api/blogs/updateBlog/${postId}`,
+        `https://nice-erin-frog-wear.cyclic.app/api/blogs/updateBlog/${postId}`,
         updatedPost,
         {
           headers: {
@@ -65,7 +65,7 @@ const PostManagement = () => {
 
   const handleDeletePost = (postId) => {
     axios
-      .delete(`http://localhost:8000/api/blogs/deleteBlog/${postId}`, {
+      .delete(`https://nice-erin-frog-wear.cyclic.app/api/blogs/deleteBlog/${postId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
