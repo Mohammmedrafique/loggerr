@@ -3,155 +3,177 @@ import axios from "axios";
 
 const PostManagement = () => {
   const [posts, setPosts] = useState([]);
+  const [token, setToken] = useState("");
+  const [newPost, setNewPost] = useState({ title: "", content: "" });
   const [searchTerm, setSearchTerm] = useState("");
-  const [editedPost, setEditedPost] = useState({
-    id: null,
-    username: "",
-    title: "",
-    content: "",
-    category: "",
-    date: "",
-    likes: 0,
-    comments: [],
-  });
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/blogs/getAllBlogs")
-      .then((response) => setPosts(response.data))
-      .catch((error) => console.error(error));
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      fetchPosts(storedToken);
+    }
   }, []);
 
-  const handleEdit = (id) => {
-    const postToEdit = posts.find((post) => post.id === id);
-
-    setEditedPost({
-      id: postToEdit.id,
-      username: postToEdit.username,
-      title: postToEdit.title,
-      content: postToEdit.content,
-      category: postToEdit.category,
-      date: postToEdit.date,
-      likes: postToEdit.likes,
-      comments: postToEdit.comments,
-    });
-  };
-
-  const handleUpdate = () => {
+  const fetchPosts = (token) => {
     axios
-      .put(
-        `http://localhost:8000/api/blogs/updateBlog/${editedPost.id}`,
-        editedPost
-      )
+      .get("http://localhost:8000/api/blogs/getAllBlogs", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
-        setPosts((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === response.data.id ? response.data : post
-          )
-        );
-        setEditedPost({
-          _id: null,
-          username: "",
-          title: "",
-          content: "",
-          category: "",
-          date: "",
-          likes: 0,
-          comments: [],
-        });
+        const responseData = response.data || {};
+        setPosts(responseData.data || []);
       })
       .catch((error) => console.error(error));
   };
 
-  const handleDelete = (id) => {
+  const handleCreatePost = () => {
     axios
-      .delete(`http://localhost:8000/api/blogs/deleteBlog/${id}`)
-      .then(() => {
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+      .post("http://localhost:8000/api/blogs/createBlog", newPost, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
+      .then(() => {
+        setNewPost({ title: "", content: "" });
+        fetchPosts(token);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleUpdatePost = (postId, updatedPost) => {
+    axios
+      .put(
+        `http://localhost:8000/api/blogs/updateBlog/${postId}`,
+        updatedPost,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(() => fetchPosts(token))
+      .catch((error) => console.error(error));
+  };
+
+  const handleDeletePost = (postId) => {
+    axios
+      .delete(`http://localhost:8000/api/blogs/deleteBlog/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => fetchPosts(token))
       .catch((error) => console.error(error));
   };
 
   const handleSearch = () => {
-    if (!searchTerm.trim()) {
-      axios
-        .get("http://localhost:8000/api/blogs")
-        .then((response) => setPosts(response.data))
-        .catch((error) => console.error(error));
-    } else {
-      axios
-        .get(`http://localhost:8000/api/blogs/searchBlogs/${searchTerm}`)
-        .then((response) => setPosts(response.data))
-        .catch((error) => console.error(error));
-    }
+    
+    console.log("Search term:", searchTerm);
   };
 
   return (
     <div className="container mx-auto mt-8 p-4">
       <h1 className="text-3xl mb-4 font-semibold">Post Management</h1>
-      <div className="mb-4 flex items-center">
-        <label className="mr-4">
-          Search by Title:
+
+      {/* Create Post */}
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Create New Post</h2>
+        <div className="flex">
           <input
             type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border rounded px-2 py-1 ml-2"
+            placeholder="Title"
+            value={newPost.title}
+            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+            className="mr-2 p-2 border"
           />
-        </label>
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Search
-        </button>
-      </div>
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Username</th>
-            <th className="py-2 px-4 border-b">Title</th>
-            <th className="py-2 px-4 border-b">Category</th>
-            <th className="py-2 px-4 border-b">Date</th>
-            <th className="py-2 px-4 border-b">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {posts.map((post) => (
-            <tr key={post.id}>
-              <td className="py-2 px-4 border-b">{post.username}</td>
-              <td className="py-2 px-4 border-b">{post.title}</td>
-              <td className="py-2 px-4 border-b">{post.category}</td>
-              <td className="py-2 px-4 border-b">{post.date}</td>
-              <td className="py-2 px-4 border-b">
-                <button
-                  onClick={() => handleEdit(post.id)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {editedPost.id && (
-        <div className="mt-4">
-          <h2 className="text-xl mb-2 font-semibold">Edit Post</h2>
+          <textarea
+            placeholder="Content"
+            value={newPost.content}
+            onChange={(e) =>
+              setNewPost({ ...newPost, content: e.target.value })
+            }
+            className="mr-2 p-2 border"
+          />
           <button
-            onClick={handleUpdate}
-            className="bg-green-500 text-white px-4 py-2 rounded"
+            onClick={handleCreatePost}
+            className="bg-blue-500 text-white p-2"
           >
-            Update
+            Create
           </button>
         </div>
-      )}
+      </div>
+
+      {/* Search */}
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Search</h2>
+        <div className="flex">
+          <input
+            type="text"
+            placeholder="Search term"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mr-2 p-2 border"
+          />
+          <button onClick={handleSearch} className="bg-blue-500 text-white p-2">
+            Search
+          </button>
+        </div>
+      </div>
+
+      {/* Display Posts */}
+      <div className="flex flex-wrap -mx-4">
+        {posts.map((post) => (
+          <div key={post._id} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+              <p className="text-gray-600 mb-4">{post.content}</p>
+              <div className="flex items-center">
+                <span className="text-gray-500">{post.username}</span>
+                <span className="text-gray-500 ml-2">{post.date}</span>
+              </div>
+              <div className="mt-4">
+                <strong>Likes:</strong> {post.likes}
+              </div>
+              <div className="mt-2">
+                <strong>Comments:</strong>
+                <ul>
+                  {post.comments.map((comment) => (
+                    <li key={comment._id}>
+                      <strong>{comment.username}:</strong> {comment.content}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-4 flex space-x-2">
+              <button
+                onClick={() => {
+                  const updatedPost = prompt(
+                    "Enter updated content:",
+                    post.content
+                  );
+                  if (updatedPost !== null) {
+                    handleUpdatePost(post._id, { content: updatedPost });
+                  }
+                }}
+                className="bg-yellow-500 text-white p-2"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => handleDeletePost(post._id)}
+                className="bg-red-500 text-white p-2"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
