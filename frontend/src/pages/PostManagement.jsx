@@ -4,7 +4,12 @@ import axios from "axios";
 const PostManagement = () => {
   const [posts, setPosts] = useState([]);
   const [token, setToken] = useState("");
-  const [newPost, setNewPost] = useState({ title: "", content: "" });
+  const [newPost, setNewPost] = useState({
+    title: "",
+    content: "",
+    username: "",
+    category: "",
+  });
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -37,7 +42,7 @@ const PostManagement = () => {
         },
       })
       .then(() => {
-        setNewPost({ title: "", content: "" });
+        setNewPost({ title: "", content: "", username: "", category: "" });
         fetchPosts(token);
       })
       .catch((error) => console.error(error));
@@ -70,7 +75,6 @@ const PostManagement = () => {
   };
 
   const handleSearch = () => {
-    
     console.log("Search term:", searchTerm);
   };
 
@@ -78,32 +82,70 @@ const PostManagement = () => {
     <div className="container mx-auto mt-8 p-4">
       <h1 className="text-3xl mb-4 font-semibold">Post Management</h1>
 
-      {/* Create Post */}
+      {/* Create Post Form */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Create New Post</h2>
-        <div className="flex">
-          <input
-            type="text"
-            placeholder="Title"
-            value={newPost.title}
-            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-            className="mr-2 p-2 border"
-          />
-          <textarea
-            placeholder="Content"
-            value={newPost.content}
-            onChange={(e) =>
-              setNewPost({ ...newPost, content: e.target.value })
-            }
-            className="mr-2 p-2 border"
-          />
-          <button
-            onClick={handleCreatePost}
-            className="bg-blue-500 text-white p-2"
-          >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreatePost();
+          }}
+        >
+          <label htmlFor="title" className="block">
+            Title:
+            <input
+              type="text"
+              id="title"
+              value={newPost.title}
+              onChange={(e) =>
+                setNewPost({ ...newPost, title: e.target.value })
+              }
+              required
+              className="border p-2"
+            />
+          </label>
+          <label htmlFor="content" className="block mt-2">
+            Content:
+            <textarea
+              id="content"
+              value={newPost.content}
+              onChange={(e) =>
+                setNewPost({ ...newPost, content: e.target.value })
+              }
+              required
+              className="border p-2"
+            />
+          </label>
+          <label htmlFor="username" className="block mt-2">
+            Username:
+            <input
+              type="text"
+              id="username"
+              value={newPost.username}
+              onChange={(e) =>
+                setNewPost({ ...newPost, username: e.target.value })
+              }
+              required
+              className="border p-2"
+            />
+          </label>
+          <label htmlFor="category" className="block mt-2">
+            Category:
+            <input
+              type="text"
+              id="category"
+              value={newPost.category}
+              onChange={(e) =>
+                setNewPost({ ...newPost, category: e.target.value })
+              }
+              required
+              className="border p-2"
+            />
+          </label>
+          <button type="submit" className="bg-blue-500 text-white p-2 mt-2">
             Create
           </button>
-        </div>
+        </form>
       </div>
 
       {/* Search */}
